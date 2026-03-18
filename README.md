@@ -116,6 +116,15 @@ mvn spring-boot:run
 A autenticação de demonstração usa o header `X-User-Id`.
 Se o header não for enviado, o filtro usa o usuário `1` por padrão.
 
+### 5.5 Swagger / OpenAPI
+
+Após subir a aplicação, acesse:
+
+- Swagger UI: `http://localhost:8080/swagger-ui.html`
+- OpenAPI JSON: `http://localhost:8080/v3/api-docs`
+
+Os endpoints de documentação ficam liberados na configuração de segurança para facilitar exploração local da API.
+
 ## 6. Como configurar banco e Flyway
 
 As migrations ficam em:
