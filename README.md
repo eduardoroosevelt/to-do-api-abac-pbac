@@ -1089,3 +1089,56 @@ Com isso, o domínio ToDo valida que é possível suportar:
 - extensão para novos recursos com baixo acoplamento.
 
 Na prática, a maior parte da evolução futura fica concentrada em **cadastro de metadados e políticas**, enquanto o código novo tende a se limitar a **casos de uso do recurso** e, eventualmente, **adaptadores técnicos pequenos** para contexto, relacionamento ou otimização de query.
+
+---
+
+## Modelagem relacional e migrations Flyway
+
+### Diagrama textual das tabelas
+
+```text
+RBAC
+  auth_role
+    └──< auth_role_permission >── auth_permission
+    └──< auth_user_role >── usuario
+
+Cadastro genérico de recursos
+  auth_resource
+    ├──< auth_resource_action
+    ├──< auth_resource_field
+    ├──< auth_resource_file_type
+    └──< auth_resource_relationship
+
+Políticas
+  auth_policy >── auth_resource
+  auth_policy >── auth_role (opcional)
+  auth_policy >── auth_permission (opcional)
+  auth_policy
+    ├──< auth_policy_condition
+    ├──< auth_policy_field_target >── auth_resource_field
+    └──< auth_policy_file_target >── auth_resource_file_type
+
+Domínio de validação
+  pessoa ──< usuario
+  pessoa ──< todo
+  usuario ──< todo
+  todo ──< todo_attachment
+```
+
+### Papel das tabelas
+
+- `auth_role`, `auth_permission`, `auth_role_permission`, `auth_user_role`: implementam RBAC macro desacoplado do domínio específico.
+- `auth_resource`, `auth_resource_action`, `auth_resource_field`, `auth_resource_file_type`, `auth_resource_relationship`: registram metadados genéricos para qualquer `resourceType`, permitindo evolução para `ESCOLA`, `ALUNO`, `CONTRATO` e outros sem alterar o schema central.
+- `auth_policy`, `auth_policy_condition`, `auth_policy_field_target`, `auth_policy_file_target`: materializam a camada ABAC/PBAC, incluindo efeito, prioridade, ação, alvo opcional de campo/anexo e condições comparando atributos de `SUBJECT`, `RESOURCE` e `CONTEXT`.
+- `pessoa`, `usuario`, `todo`, `todo_attachment`: compõem o domínio mínimo de validação e demonstram como o motor genérico pode ser aplicado a um recurso real com campos sensíveis, tenant, escola e anexos tipados.
+
+### Como a modelagem suporta novas features no futuro
+
+A extensibilidade vem do fato de que o schema de autorização é dirigido por cadastro. Para uma nova feature, a evolução normal é:
+
+1. criar apenas as tabelas de domínio da nova feature;
+2. inserir um novo `auth_resource` com o `resourceType` correspondente;
+3. cadastrar ações, campos, tipos de arquivo e relacionamentos nas tabelas metadata-driven;
+4. criar políticas e condições sem alterar as tabelas centrais de autorização.
+
+Em outras palavras, o schema base de autorização não precisa ser reescrito para cada novo recurso; o crescimento tende a ocorrer por dados e não por refatoração estrutural.
