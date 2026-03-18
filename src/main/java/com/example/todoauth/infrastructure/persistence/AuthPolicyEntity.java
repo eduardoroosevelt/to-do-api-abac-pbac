@@ -2,8 +2,8 @@ package com.example.todoauth.infrastructure.persistence;
 
 import jakarta.persistence.*;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "auth_policy")
@@ -39,11 +39,11 @@ public class AuthPolicyEntity extends BaseAuditableEntity {
     @Column(name = "valid_until")
     private OffsetDateTime validUntil;
     @OneToMany(mappedBy = "policy", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<AuthPolicyConditionEntity> conditions = new ArrayList<>();
+    private Set<AuthPolicyConditionEntity> conditions = new LinkedHashSet<>();
     @OneToMany(mappedBy = "policy", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<AuthPolicyFieldTargetEntity> fieldTargets = new ArrayList<>();
+    private Set<AuthPolicyFieldTargetEntity> fieldTargets = new LinkedHashSet<>();
     @OneToMany(mappedBy = "policy", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<AuthPolicyFileTargetEntity> fileTargets = new ArrayList<>();
+    private Set<AuthPolicyFileTargetEntity> fileTargets = new LinkedHashSet<>();
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -75,7 +75,7 @@ public class AuthPolicyEntity extends BaseAuditableEntity {
     public void setValidFrom(OffsetDateTime validFrom) { this.validFrom = validFrom; }
     public OffsetDateTime getValidUntil() { return validUntil; }
     public void setValidUntil(OffsetDateTime validUntil) { this.validUntil = validUntil; }
-    public List<AuthPolicyConditionEntity> getConditions() { return conditions; }
-    public List<AuthPolicyFieldTargetEntity> getFieldTargets() { return fieldTargets; }
-    public List<AuthPolicyFileTargetEntity> getFileTargets() { return fileTargets; }
+    public Set<AuthPolicyConditionEntity> getConditions() { return conditions; }
+    public Set<AuthPolicyFieldTargetEntity> getFieldTargets() { return fieldTargets; }
+    public Set<AuthPolicyFileTargetEntity> getFileTargets() { return fileTargets; }
 }
